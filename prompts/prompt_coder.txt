@@ -1,0 +1,45 @@
+Develop a custom class, `card_estimator`, that inherits from `base_card_estimator` to implement a tailored cardinality estimator using the described statistics. The main goal is to achieve high accuracy in cardinality estimation by leveraging the specific statistics designed for the workload, while ensuring that the estimation logic is efficient and robust.
+
+# Checklist
+Carefully analyze the provided specifications. They are based on a thorough analysis of the database schema and the workload.
+Implement the estimator class in `card_estimator.py`. Ensure that the code is well-structuredand adheres to Python best practices. Focus on clarity and maintainability while meeting the functional requirements.
+Ask the planner with the provided tool for any clarifications on how the proposed statistics should be used together in the estimation logic or if any statistics are missing.
+
+# Instructions
+Implement the two required methods as defined in `base_card_estimator`:
+    `setup()` gathers all statistics required for estimation as described in the given specifications.
+    `estimate(tables: list, filters: list, joins: list)` estimates cardinality from precomputed statistics.
+    **Performance constraint:** `setup()` is allowed to be resource-intensive, but `estimate()` must remain efficient and fast.
+Do not deviate from the provided specifications or take shortcut that compromises the accuracy of the estimator. The goal is to create a robust and accurate estimator, not just a quick implementation.
+Do not estimate based on arbitrary magic numbers or hardcoded values; all estimates must be derived from the statistics; fallback approaches should be at least as accurate as Postgres' estimation logic.
+
+## setup()
+Use the `custom_csv_reader(table_name: str)` provided by `base_card_estimator`, which yields a csv.reader for the given table.
+    CSV files contain headers as the first row.
+Responsibilities:
+    Store computed statistics or data structures as organized instance variables.
+    Be memory aware; the memory footprint of the estimator object will be evaluated after setup; do **not** store full value counts per column for large tables.
+    Confirm successful setup or immediately raise descriptive errors if any file or data issue occurs.
+    For efficiency, compute statistics on randomly sampled rows as specified in the given plan. Ensure that sampling is reproducible (e.g., by setting a random seed). Make sure to apply a scaled-up logic to the estimates based on the sample size relative to the total table size.
+
+## estimate()
+Accepts three lists of dictionaries, representing a logical query plan in preorder:
+    **tables**: each dict has "name" and "alias"
+    **filters**: nested or leaf filters
+        Nested: {"operator", "children"}; Leaf: {"alias", "column", "operator", "literal"}
+        Operators: "AND" or "OR" for nested, otherwise "=", ">", "<", ">=", "<=", "!=", "LIKE", "NOT LIKE", "IN", "IS NULL", "IS NOT NULL"; literals for IS (NOT) NULL are None
+    **joins**: each dict has "alias1", "column1", "alias2", "column2"
+Requirements and constraints:
+    Validate that all referenced tables, aliases, and columns match the parsed setup; raise clear, descriptive exceptions where invalid.
+    Use only precomputed statistics; no additional file/data access in `estimate()`.
+    After producing the estimate, perform a brief self-consistency check: confirm the estimate aligns with the available statistics and, if inconsistent, attempt a minimal self-correction.
+Example input:
+    [{"name":"person_info","alias":"pi"},{"name":"info_type","alias":"it"}],
+    [{"alias":"pi","column":"note","operator":"IS NOT NULL","literal":None},{"alias":"it","column":"info","operator":"=","literal":"mini biography"}],
+    [{"alias1":"pi","column1":"info_type_id","alias2":"it","column2":"id"}]
+
+# Output Format
+After implementing the estimator, use the evaluate tool to test your implementation. Once it returns "success" you can stop. Otherwise, fix errors and re-evaluate until successful.
+
+# Statistics specifications
+{statistics}
