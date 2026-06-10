@@ -3,6 +3,7 @@
 [![uv](https://img.shields.io/badge/dependency%20manager-uv-orange.svg)](https://github.com/astral-sh/uv)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Status](https://img.shields.io/badge/status-under%20submission-yellow.svg)]()
+[![Paper](https://img.shields.io/badge/paper-arXiv-red.svg)](https://arxiv.org/pdf/2606.09361)
 
 # Bespoke-Card
 
@@ -11,6 +12,9 @@ Source code of the paper *Bespoke-Card: Why Tune When You Can Generate? Synthesi
 **Authors:** Johannes Wehrstein, Anton Winter, Timo Eckmann, Carsten Binnig
 
 > **Status:** under submission
+
+**Quick links:** &nbsp;
+[📄 Paper](https://arxiv.org/pdf/2606.09361)
 
 <div align="center">
     <figure>
